@@ -19,7 +19,7 @@
 //   "exercise:complete"         - All sets done (celebration!)
 //   "nightlight:on"             - Turn on soft night light
 //   "nightlight:off"            - Turn off night light
-//   "sleeplight:on:MINUTES"     - Start sleep light (dims over X minutes)
+//   "sleeplight:on:SECONDS"     - Start sleep light (dims over X seconds)
 //   "sleeplight:off"            - Turn off sleep light
 
 #include <Adafruit_NeoPixel.h>
@@ -39,7 +39,7 @@ Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 // ====== Color definitions ======
 const byte WARM_Y_R = 255, WARM_Y_G = 215, WARM_Y_B = 120;  // Warm Yellow (presence)
 const byte RED_R = 255, RED_G = 0, RED_B = 0;                // Red (warning/overtime)
-const byte GREEN_R = 0, GREEN_G = 255, GREEN_B = 100;        // Green (exercise active)
+const byte GREEN_R = 0, GREEN_G = 255, GREEN_B = 0;          // Pure green (exercise active)
 const byte YELLOW_R = 255, YELLOW_G = 180, YELLOW_B = 0;     // Yellow/Orange (rest)
 const byte NIGHT_R = 255, NIGHT_G = 150, NIGHT_B = 0;        // Warm yellow (night light) - no blue!
 const byte SLEEP_R = 255, SLEEP_G = 80, SLEEP_B = 0;         // Warm orange-red (sleep light)
@@ -322,16 +322,16 @@ void processCommand(String cmd) {
   
   // ===== SLEEP LIGHT COMMANDS =====
   else if (cmd.startsWith("sleeplight:on")) {
-    // Format: sleeplight:on:MINUTES or just sleeplight:on (default 30 min)
-    int minutes = 30;  // Default
+    // Format: sleeplight:on:SECONDS or just sleeplight:on (default 1800s = 30 min)
+    int seconds = 1800;  // Default 30 min
     if (cmd.length() > 14 && cmd.charAt(13) == ':') {
-      minutes = cmd.substring(14).toInt();
-      if (minutes <= 0) minutes = 30;
+      seconds = cmd.substring(14).toInt();
+      if (seconds <= 0) seconds = 1800;
     }
     
     currentState = STATE_SLEEP_LIGHT;
     sleepLightStartTime = millis();
-    sleepLightDurationMs = (unsigned long)minutes * 60UL * 1000UL;
+    sleepLightDurationMs = (unsigned long)seconds * 1000UL;
     setColor(SLEEP_R, SLEEP_G, SLEEP_B);  // Start at full brightness
   }
   else if (cmd == "sleeplight:off") {
